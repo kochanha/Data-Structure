@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct node {
+   struct node* prev, * next;
+   char elem;
+}node;
+
+int n = 0;
+node* h = NULL;
+node* t = NULL;
+
+node* getnode(node* p) {
+   p = (node*)malloc(sizeof(node));
+   return p;
+}
+
+void addnode(int r, char x) {
+   node* p = NULL, * tmp = NULL;
+   p = h;
+   n++;
+   if (r<0 || r>n) {
+      printf("invalid position\n");
+      n--;
+      return;
+   }
+   else {
+      node* q = NULL;
+      q = getnode(q);
+      q->elem = x;
+
+      for (int i = 0;i < r;i++) {
+         p = p->next;
+      }
+      (p->prev)->next = q;
+      q->prev = p->prev;
+      q->next = p;
+      p->prev = q;
+   }
+}
+
+void del(int r) {
+   node* p = h, * t = NULL;
+   if (r<0 || r>n) {
+      printf("invalid position\n");
+      return;
+   }
+   else {
+      for (int i = 0;i < r;i++) {
+         p = p->next;
+      }
+      if (p == t) {
+         printf("invalid position\n");
+         return;
+      }
+      else {
+         t = p;
+         (p->prev)->next = p->next;
+         (p->next)->prev = p->prev;
+         free(t);
+         n--;
+      }
+   }
+}
+
+void getlist(int r) {
+   node* p = h;
+   if (r<0 || r>n) {
+      printf("invalid position\n");
+      return;
+   }
+   else {
+      for (int i = 0;i < r;i++) {
+         p = p->next;
+      }
+      printf("%c\n", p->elem);
+      return;
+   }
+}
+
+void printlist() {
+   node* p = h->next;
+   while (p != t) {
+      printf("%c", p->elem);
+      p = p->next;
+   }
+   printf("\n");
+}
+int main() {
+   int num, r;
+   char ch, x;
+   
+   h = getnode(h);
+   t = getnode(t);
+   h->next = t;
+   t->prev = h;
+
+   scanf("%d", &num);
+   getchar();
+   for (int i = 0;i < num;i++) {
+      scanf("%c", &ch);
+      if (ch == 'A') {
+         scanf("%d %c", &r, &x);
+         addnode(r, x);
+      }
+      else if (ch == 'D') {
+         scanf("%d", &r);
+         del(r);
+      }
+      else if(ch=='G'){
+         scanf("%d", &r);
+         getlist(r);
+      }
+      else if (ch == 'P') {
+         printlist();
+      }
+      getchar();
+   }
+
+   node* p = h;
+   while (p != t) {
+      p = p->next;
+      free(h);
+      h = p;
+   }
+   free(t);
+
+   return 0;
+}
