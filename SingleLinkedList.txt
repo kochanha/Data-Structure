@@ -1,0 +1,148 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct NODE {
+   char data;
+   struct NODE* next;
+} node;
+
+int n = 0;
+node* head = NULL;
+node* tail = NULL;
+
+node* getnode(node* p) {
+   p = (node*)malloc(sizeof(node));
+   p->next = NULL;
+   return p;
+}
+
+void add(node* head, int r, char e) {
+   node* p = NULL;
+   p = head;
+   n++;
+
+   if (r<0 || r>n) {
+      printf("invalid position\n");
+      n--;
+      return;
+   }
+   else {
+      node* q = NULL;
+      q = getnode(q);
+      q->data = e;
+
+      if (head->next == tail) {
+         q->next = tail;
+         head->next = q;
+      }
+
+      else {
+         for (int i = 0; i < r - 1; i++) {
+            p = p->next;
+         }
+         q->next = p->next;
+         p->next = q;
+      }
+   }
+}
+
+void delete(node* head, int r) {
+   node* p = NULL;
+   p = head;
+
+   if (r<0 || r>n) {
+      printf("invalid position\n");
+      return;
+   }
+   else {
+      for (int i = 0; i < r; i++) {
+         p = p->next;
+      }
+      if (p == tail) {
+         printf("invalid position\n");
+      }
+      else {
+         node* q = NULL;
+         q = head;
+         for (int i = 0; i < r - 1; i++) {
+            q = q->next;
+         }
+         q->next = p->next;
+         p->next = NULL;
+         free(p);
+         n--;
+      }
+
+   }
+
+}
+
+void get(node* head, int r) {
+   node* p = head;
+
+   if (r<0 || r>n) {
+      printf("invalid position\n");
+      return;
+   }
+
+   else {
+      for (int i = 0; i < r; i++) {
+         p = p->next;
+      }
+      printf("%c", p->data);
+   }
+   printf("\n");
+}
+
+
+void print(node* head) {
+   node *p = NULL;
+   p = head->next;
+
+   while (p != tail) {
+      printf("%c", p->data);
+      p = p->next;
+   }
+   printf("\n");
+
+}
+
+int main() {
+   int num, r;
+   int i;
+   char ch, e;
+
+   head = getnode(head);
+   tail = getnode(tail);
+
+   head->next = tail;
+   tail->next = NULL;
+
+   scanf("%d", &num);
+   getchar();
+
+   for (i = 0; i < num; i++) {
+      scanf("%c", &ch);
+
+      if (ch == 'A') {
+         scanf("%d %c", &r, &e);
+         add(head, r, e);
+      }
+      else if (ch == 'D') {
+         scanf("%d", &r);
+         delete(head, r);
+      }
+      else if (ch == 'G') {
+         scanf("%d", &r);
+         get(head, r);
+      }
+      else if (ch == 'P') {
+
+         print(head);
+      }
+      getchar();
+   }
+
+}
