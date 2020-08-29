@@ -1,0 +1,103 @@
+#define CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct node {
+    int elem;
+    struct node* next;
+
+}node;
+
+struct Que {
+    struct node* f;
+    struct node* r;
+};
+
+void initQueue(struct Que *q) {
+    q->f = NULL;
+    q->r = NULL;
+}
+
+struct node* getNode() {
+    struct node* p = (struct node*)malloc(sizeof(struct node));
+    p->elem = -1;
+    p->next = NULL;
+    return p;
+}
+
+int isEmpty(struct Que *q) {
+    return(q->f == NULL);
+}
+
+void enqueue(struct Que *q, int e) {
+    struct node* p = getNode();
+    p->elem = e;
+    p->next = NULL;
+
+    if (isEmpty(q)) {
+        q->f = p;
+        q->r = p;
+    }
+    else {
+        q->r->next = p;
+        q->r = p;
+    }
+}
+
+void emptyQueueException() {
+    printf("EmptyQueueException\n");
+}
+
+void putnode(struct node *p) {
+    free(p);
+    p = NULL;
+}
+
+int dequeue(struct Que *q) {
+    if (isEmpty(q)) {
+        emptyQueueException();
+        return -1;
+    }
+
+    int e = q->f->elem;
+    struct node* p = q->f;
+    q->f = q->f->next;
+
+    if (q->f == NULL) {
+        q->r = NULL;
+    }
+    putnode(p);
+    return e;
+}
+
+void traverse(struct Que *q) {
+    struct node* p = q->f;
+
+    while (p != NULL) {
+        printf(" %d", p->elem);
+        p = p->next;
+    }
+    printf("\n");
+}
+
+int main() {
+
+    struct Que q;
+
+    initQueue(&q);
+    enqueue(&q, 10);
+    enqueue(&q, 20);
+    traverse(&q);
+
+    enqueue(&q, 30);
+    enqueue(&q, 40);
+    dequeue(&q);
+    traverse(&q);
+
+    enqueue(&q, 50);
+    enqueue(&q, 60);
+    enqueue(&q,70);
+    traverse(&q);
+}
+
