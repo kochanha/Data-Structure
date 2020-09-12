@@ -1,0 +1,108 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct NODE {
+    char e;
+    NODE* next;
+}NODE;
+
+void getNode(NODE** p)
+{
+    (*p) = (NODE*)malloc(sizeof(NODE));
+    (*p)->next = NULL;
+}
+
+void push(NODE* H, char e)
+{
+    NODE* p = NULL;
+    getNode(&p);
+    p->e = e;
+
+    p->next = H->next;
+    H->next = p;
+}
+
+char pop(NODE* H)
+{
+    NODE* del = H->next;
+    char e = del->e;
+
+    H->next = H->next->next;
+    free(del);
+
+    return e;
+}
+
+char top(NODE* H)
+{
+    if (H->next != NULL) return H->next->e;
+}
+int priority(char c)
+{
+    if (c == '*') return 5;
+    else if (c == '/') return 5;
+    else if (c == '+') return 4;
+    else if (c == '-') return 4;
+    else return 1;
+}
+
+void main()
+{
+    NODE* H = NULL;
+    getNode(&H);
+
+    char infix[100];
+    char postfix[100];
+
+
+
+    int cnt = 0;
+    printf("Please Enter an Equation : ");
+    scanf("%s", infix); printf("\n");
+    for (int j = 0; j < (int)strlen(infix); j++)
+    {
+        if (infix[j] >= '0' && infix[j] <= '9')
+        {
+            postfix[cnt] = infix[j];
+            cnt++;
+        }
+        else if (infix[j] == '(')
+        {
+            push(H, infix[j]);
+        }
+        else if (infix[j] == ')')
+        {
+            while (H->next->e != '(')
+            {
+                postfix[cnt] = pop(H);
+                cnt++;
+            }
+            pop(H);
+        }
+        else
+        {
+            if (H->next == NULL) push(H, infix[j]);
+            else
+            {
+                while (priority(H->next->e) >= priority(infix[j]))
+                {
+                    postfix[cnt] = pop(H);
+                    cnt++;
+                    if (H->next == NULL) break;
+                }
+                push(H, infix[j]);
+            }
+        }
+    }
+    while (H->next != NULL)
+    {
+        postfix[cnt] = pop(H);
+        cnt++;
+    }
+    postfix[cnt] = NULL;
+    printf("[postfix]  =>  %s\n", postfix);
+    printf("[infix]    =>  %s\n", infix);
+
+}

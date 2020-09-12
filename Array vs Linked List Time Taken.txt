@@ -1,0 +1,258 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+typedef struct NODE {
+    int data;
+    int row;
+    int column;
+
+    struct NODE* next; //node structure of linklist
+} node;
+
+node* head1 = NULL;
+node* tail1 = NULL; // head and tail node for matrix1
+node* head2 = NULL;
+node* tail2 = NULL; // head and tail node for matrix2
+node* head_sum = NULL;
+node* tail_sum = NULL; // head and tail node for sum of matrix
+node* head_mul = NULL;
+node* tail_mul = NULL; // head and tail node for multiply of matrix
+
+node* getnode(node* p) {
+    p = (node*)malloc(sizeof(node));
+    p->next = NULL;
+    return p;
+}
+
+void add(node* head, node* tail, int r, int c, int d) {
+    node* p = NULL;
+    p = head;
+
+    node* q = NULL;
+    q = getnode(q);
+    q->data = d;
+    q->row = r;
+    q->column = c; //new node initiallize
+
+
+    while (p->next != tail) {
+        p = p->next; // bring p to the end of linked list
+    }
+    q->next = tail;
+    p->next = q; //put new node q before tail
+
+}
+
+int get(node* head, int r, int c, int mat) {
+    node* p = head;
+
+    for (int i = 0; i <= mat; i++) {
+        if (p->column == c && p->row == r) {
+            return p->data; //return data if column and row matches
+        }
+        p = p->next;
+    }
+}
+
+
+void print(node* head, node* tail, int c1) {
+    node* p = NULL;
+    p = head->next;
+    int i = 0;
+
+    while (p != tail) {
+        i++; //count i
+        printf(" %2d ", p->data); //print data
+        if (i % c1 == 0) {
+            printf("\n"); //print "\n" if it prints all the column data
+        }
+        p = p->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    int r, c, e;
+    char ch;
+
+    printf("row: ");
+    scanf("%d", &r);
+    printf("column: ");
+    scanf("%d", &c);    //get row and column data from the user.
+    printf("\n---------------------------------------------------------------------\n");
+
+    getchar();
+
+    int** arr1 = (int**)malloc(sizeof(int*) * r);
+    for (int i = 0; i < r; i++)
+    {
+        arr1[i] = (int*)malloc(sizeof(int) * c);
+    }
+
+    int** arr2 = (int**)malloc(sizeof(int*) * r);
+    for (int i = 0; i < r; i++)
+    {
+        arr2[i] = (int*)malloc(sizeof(int) * c);
+    }
+
+    int** mul = (int**)malloc(sizeof(int*) * r);
+    for (int i = 0; i < r; i++)
+    {
+        mul[i] = (int*)malloc(sizeof(int) * c);     //use dynamic allocation to put data efficiently into array
+    }
+
+    head1 = getnode(head1);
+    tail1 = getnode(tail1);
+
+    head1->next = tail1;
+    tail1->next = NULL;
+
+    head2 = getnode(head2);
+    tail2 = getnode(tail2);
+
+    head2->next = tail2;
+    tail2->next = NULL;
+
+    int mat = r * c;
+
+    for (int i = 0; i < r; i++) { //row
+        for (int j = 0; j < c; j++) //column
+        {
+            e = rand() % 10; // make random number 0 to 9
+            arr1[i][j] = e; // allocate into array1
+            add(head1, tail1, i, j, e); //add to linked list 1
+        }
+    }
+
+    for (int i = 0; i < r; i++) { //row
+        for (int j = 0; j < c; j++) //column
+        {
+            e = rand() % 10;// make random number 0 to 9
+            arr2[i][j] = e;// allocate into array2
+            add(head2, tail2, i, j, e);//add to linked list 2
+        }
+    }
+
+    printf("(LL and Array) matrix no.1\n");
+    print(head1, tail1, c);
+    printf("(LL and Array) matrix no.2\n");
+    print(head2, tail2, c);
+
+    printf("---------------------------------------------------------------------\n");
+
+    head_sum = getnode(head_sum);
+    tail_sum = getnode(tail_sum); //getnode for sum made of linked list
+
+    head_sum->next = tail_sum;
+    tail_sum->next = NULL; //initiallize
+
+    int a, b, sum = 0;
+
+    time_t link_sum_start = clock(); //start time
+
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            a = get(head1, i, j, mat); //get data from linked list 1
+            b = get(head2, i, j, mat); //get data from linked list 2
+
+            sum = a + b; //sum
+            add(head_sum, tail_sum, i, j, sum); //add sum to new linked list
+        }
+        sum = 0;
+    }
+    printf("[result of SUM using LINKED LIST]\n");
+    print(head_sum, tail_sum, c); //print linked list version of sum
+
+    time_t link_sum_end = clock(); //end time
+
+    double link_sum_result = (double)(link_sum_end - link_sum_start) / CLOCKS_PER_SEC;
+    printf("※Sum of two matrices made of LINKED LIST time taken: %f", link_sum_result); //print time taken of linked list sum
+    printf("\n---------------------------------------------------------------------\n");
+
+
+    time_t arr_sum_start = clock(); //start time
+
+    printf("[result of SUM using ARRAY]\n");
+    for (int i = 0; i < r; i++)
+    {
+        for (int j = 0; j < c; j++)
+        {
+            printf(" %2d ", arr1[i][j] + arr2[i][j]); //add two arrays and print
+        }
+        printf("\n");
+    }
+
+    time_t arr_sum_end = clock(); //end time
+
+    double arr_sum_result = (double)(arr_sum_end - arr_sum_start) / CLOCKS_PER_SEC;
+    printf("\n※Sum of two matrices made of ARRAY time taken: %f", arr_sum_result); //print time taken of array sum
+    printf("\n---------------------------------------------------------------------\n");
+
+    time_t link_mul_start = clock(); //start time
+
+    head_mul = getnode(head_mul);
+    tail_mul = getnode(tail_mul);   //getnode for multiply made of linked list
+
+    head_mul->next = tail_mul;
+    tail_mul->next = NULL;  //initiallize
+
+    int x, y;
+    int multiply = 0;
+
+    for (int i = 0; i < r; i++) {   //sequence of multiplying two matrices made of linked list
+        for (int j = 0; j < c; j++) {
+            multiply = 0;
+            for (int k = 0; k < r; k++) {
+                x = get(head1, i, k, mat);  //get data from linked list 1
+                y = get(head2, k, j, mat);  //get data from linked list 2
+
+                multiply += x * y;
+            }
+            add(head_mul, tail_mul, i, j, multiply); //add data to new linked list for multiplying
+        }
+    }
+    time_t link_mul_end = clock(); //time end
+    printf("[result of MULTYPLY using LINKED LIST]\n");
+    print(head_mul, tail_mul, c);
+    double link_mul_result = (double)(link_mul_end - link_mul_start) / CLOCKS_PER_SEC;
+    printf("※Multiply of two matrices made of LINKED LIST time taken: %f", link_mul_result);    //print time taken of linked list multiply
+    printf("\n---------------------------------------------------------------------\n");
+
+    time_t arr_mul_start = clock(); //time start
+
+    for (int i = 0; i < r; i++) //sequence of multiplying two matrices made of array
+    {
+        for (int j = 0; j < c; j++)
+        {
+            mul[i][j] = 0; //initiallize new array
+            for (int k = 0; k < c; k++)
+            {
+                mul[i][j] += arr1[i][k] * arr2[k][j];
+            }
+        }
+    }
+
+
+
+    printf("[result of MULTIPLY using ARRAY]\n");
+    for (int i = 0; i < r; i++)
+    {
+        for (int j = 0; j < c; j++)
+        {
+            printf(" %2d ", mul[i][j]); //print array
+        }
+        printf("\n");
+    }
+
+    time_t arr_mul_end = clock(); //time end
+    double arr_mul_result = (double)(arr_mul_end - arr_mul_start) / CLOCKS_PER_SEC;
+    printf("\n※Multiply of two matrices made of ARRAY time taken: %f", arr_sum_result); //print time taken of array multiply
+    printf("\n---------------------------------------------------------------------\n");
+
+    free(arr1); //releasing memory
+    free(arr2);   //releasing memory
+    free(mul);   //releasing memory
+}
